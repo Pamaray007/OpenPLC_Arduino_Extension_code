@@ -1,0 +1,77 @@
+
+/*
+  code to demonstrate arduino extension in OpenPLC
+  By: Engineering Made Easy (@engineeringmadeeasyingme6819)
+  Date: 17/08/2025
+*/
+
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+int Count_Val;                               
+const long delay_time  = 1000;                 
+long previous_millis = 0;                      
+
+
+LiquidCrystal_I2C lcd(0x27,16,2);           // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+void sketch_setup()
+{
+  lcd.init();                               // initialize the lcd 
+
+  lcd.backlight();                          //turn LCD backlight
+  lcd.setCursor(0,0);                       
+  lcd.print("PRESS STATE: ");  				//display Press Drive state on first Row of LCD 
+  lcd.setCursor(0,1);                       
+  lcd.print("COUNT: ");                     //display Counter value  on second row of LCD 
+  lcd.setCursor(11,1);                      
+  lcd.print("MS: ");                		// display Material sensor(Sensor B) state on LCD
+
+  Count_Val = Count_LCD;                    //retrieve initial POT data
+}
+
+void sketch_loop()   
+{
+	//*****************************************
+	//Logic to monitor status of Press drive
+	//*****************************************
+	if (Press_Drive_LCD)
+	{                   
+	  lcd.setCursor(13,0);                  //print ON to indicate press drive on
+	  lcd.print("ON ");   
+	}
+	else
+	{
+	  lcd.setCursor(13,0);                  //print OFF to indicate press drive off
+	  lcd.print("OFF");   
+	}
+
+	//*****************************************
+	//Logic to monitor status of sensor B 
+	//*****************************************
+    if (SensorB_LCD)
+	{                   
+	  lcd.setCursor(15,1);                  //print 1 to indicate material on press bench
+	  lcd.print("1");   
+	}
+	else
+	{
+	  lcd.setCursor(15,1);                  //print 0 to indicate No material on press bench
+	  lcd.print("0");   
+	}
+	
+    lcd.setCursor(7,1);                       // print count value on the LCD
+	lcd.print(Count_Val);
+
+        
+	//*****************************************
+	//refresh Counter value on the LCD
+	//*****************************************
+	if (millis() - previous_millis >= delay_time ) 
+	{ 
+	   previous_millis = millis();
+	   Count_Val = Count_LCD;   
+	   lcd.setCursor(7,1);
+	   lcd.print("  ");
+	}
+}
